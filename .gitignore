@@ -1,0 +1,8 @@
+node_modules/
+dist/
+.env
+credentials.json
+token.json
+src/test.json
+
+/src/generated/prisma

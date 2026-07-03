@@ -1,0 +1,32 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Get a free hosted Postgres database in seconds: `npx create-db`
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "./generated/client"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model ProcessedEmail {
+  id                   Int      @id @default(autoincrement())
+  gmailMessageId       String   @unique
+  threadId             String?
+  sender               String
+  subject              String
+  snippet              String?
+  category             String
+  importance           String
+  recommendedAction    String
+  classificationReason String?
+  aiCategory           String?
+  aiConfidence         Float?
+  aiReason             String?
+  labelApplied         Boolean  @default(false)
+  processedAt          DateTime @default(now())
+  updatedAt            DateTime @updatedAt
+}

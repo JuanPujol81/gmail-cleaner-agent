@@ -1,0 +1,16 @@
+services:
+  postgres:
+    image: postgres:16
+    container_name: gmail-cleaner-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: gmail_user
+      POSTGRES_PASSWORD: gmail_password
+      POSTGRES_DB: gmail_cleaner
+    ports:
+      - "5432:5432"
+    volumes:
+      - gmail_cleaner_data:/var/lib/postgresql/data
+
+volumes:
+  gmail_cleaner_data:
