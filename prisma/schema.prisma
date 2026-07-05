@@ -18,6 +18,7 @@ model ProcessedEmail {
   threadId            String?
   sender              String
   subject             String
+  date                String?
   snippet             String?
   category            String
   importance          String

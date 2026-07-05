@@ -20,7 +20,7 @@ function getGmailClient() {
   });
 }
 
-export async function getRecentMessages(maxResults = 10) {
+export async function getRecentMessages(maxResults = 100) {
   const gmail = getGmailClient();
 
   const listResponse = await gmail.users.messages.list({

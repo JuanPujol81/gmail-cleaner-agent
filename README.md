@@ -42,7 +42,7 @@ Response (JSON):
 ```json
 {
   "status": "success",
-  "count": 10,
+  "count": 100,
   "inboxSummary": { "...": "..." },
   "messages": [
     {
@@ -69,7 +69,7 @@ Response (JSON):
 ```json
 {
   "status": "success",
-  "count": 10,
+  "count": 100,
   "inboxSummary": { "...": "..." }
 }
 ```
@@ -84,7 +84,7 @@ Generates an AI analysis of the current inbox summary.
 
 This endpoint:
 
-- Reads the latest 10 messages from `INBOX`.
+- Reads the latest 100 messages from `INBOX`.
 - Classifies each message with local rules.
 - Builds `inboxSummary`.
 - Sends the summary to AI to produce `overview`, `priorityLevel`, `priorityReason`, `suggestedPlan`, and `safetyNote`.
@@ -97,7 +97,7 @@ Response (JSON):
 ```json
 {
   "status": "success",
-  "count": 10,
+  "count": 100,
   "inboxSummary": { "...": "..." },
   "aiSummary": {
     "overview": "...",
@@ -132,7 +132,7 @@ Response:
 ```json
 {
   "status": "success",
-  "count": 10,
+  "count": 100,
   "applied": {
     "AI/Job": 2,
     "AI/Promotion": 1,

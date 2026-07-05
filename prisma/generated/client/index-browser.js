@@ -126,6 +126,7 @@ exports.Prisma.ProcessedEmailScalarFieldEnum = {
   threadId: 'threadId',
   sender: 'sender',
   subject: 'subject',
+  date: 'date',
   snippet: 'snippet',
   category: 'category',
   importance: 'importance',

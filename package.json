@@ -6,6 +6,8 @@
   "main": "index.js",
   "scripts": {
     "dev": "tsx watch src/app.ts",
+    "dev:frontend": "pnpm --dir frontend dev",
+    "build:frontend": "pnpm --dir frontend build",
     "build": "tsc",
     "start": "node dist/app.js",
     "format": "prettier --write .",

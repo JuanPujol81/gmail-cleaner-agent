@@ -894,6 +894,7 @@ export namespace Prisma {
     threadId: string | null
     sender: string | null
     subject: string | null
+    date: string | null
     snippet: string | null
     category: string | null
     importance: string | null
@@ -913,6 +914,7 @@ export namespace Prisma {
     threadId: string | null
     sender: string | null
     subject: string | null
+    date: string | null
     snippet: string | null
     category: string | null
     importance: string | null
@@ -932,6 +934,7 @@ export namespace Prisma {
     threadId: number
     sender: number
     subject: number
+    date: number
     snippet: number
     category: number
     importance: number
@@ -963,6 +966,7 @@ export namespace Prisma {
     threadId?: true
     sender?: true
     subject?: true
+    date?: true
     snippet?: true
     category?: true
     importance?: true
@@ -982,6 +986,7 @@ export namespace Prisma {
     threadId?: true
     sender?: true
     subject?: true
+    date?: true
     snippet?: true
     category?: true
     importance?: true
@@ -1001,6 +1006,7 @@ export namespace Prisma {
     threadId?: true
     sender?: true
     subject?: true
+    date?: true
     snippet?: true
     category?: true
     importance?: true
@@ -1107,6 +1113,7 @@ export namespace Prisma {
     threadId: string | null
     sender: string
     subject: string
+    date: string | null
     snippet: string | null
     category: string
     importance: string
@@ -1145,6 +1152,7 @@ export namespace Prisma {
     threadId?: boolean
     sender?: boolean
     subject?: boolean
+    date?: boolean
     snippet?: boolean
     category?: boolean
     importance?: boolean
@@ -1164,6 +1172,7 @@ export namespace Prisma {
     threadId?: boolean
     sender?: boolean
     subject?: boolean
+    date?: boolean
     snippet?: boolean
     category?: boolean
     importance?: boolean
@@ -1183,6 +1192,7 @@ export namespace Prisma {
     threadId?: boolean
     sender?: boolean
     subject?: boolean
+    date?: boolean
     snippet?: boolean
     category?: boolean
     importance?: boolean
@@ -1202,6 +1212,7 @@ export namespace Prisma {
     threadId?: boolean
     sender?: boolean
     subject?: boolean
+    date?: boolean
     snippet?: boolean
     category?: boolean
     importance?: boolean
@@ -1215,7 +1226,7 @@ export namespace Prisma {
     updatedAt?: boolean
   }
 
-  export type ProcessedEmailOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "gmailMessageId" | "threadId" | "sender" | "subject" | "snippet" | "category" | "importance" | "recommendedAction" | "classificationReason" | "aiCategory" | "aiConfidence" | "aiReason" | "labelApplied" | "processedAt" | "updatedAt", ExtArgs["result"]["processedEmail"]>
+  export type ProcessedEmailOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "gmailMessageId" | "threadId" | "sender" | "subject" | "date" | "snippet" | "category" | "importance" | "recommendedAction" | "classificationReason" | "aiCategory" | "aiConfidence" | "aiReason" | "labelApplied" | "processedAt" | "updatedAt", ExtArgs["result"]["processedEmail"]>
 
   export type $ProcessedEmailPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     name: "ProcessedEmail"
@@ -1226,6 +1237,7 @@ export namespace Prisma {
       threadId: string | null
       sender: string
       subject: string
+      date: string | null
       snippet: string | null
       category: string
       importance: string
@@ -1665,6 +1677,7 @@ export namespace Prisma {
     readonly threadId: FieldRef<"ProcessedEmail", 'String'>
     readonly sender: FieldRef<"ProcessedEmail", 'String'>
     readonly subject: FieldRef<"ProcessedEmail", 'String'>
+    readonly date: FieldRef<"ProcessedEmail", 'String'>
     readonly snippet: FieldRef<"ProcessedEmail", 'String'>
     readonly category: FieldRef<"ProcessedEmail", 'String'>
     readonly importance: FieldRef<"ProcessedEmail", 'String'>
@@ -2067,6 +2080,7 @@ export namespace Prisma {
     threadId: 'threadId',
     sender: 'sender',
     subject: 'subject',
+    date: 'date',
     snippet: 'snippet',
     category: 'category',
     importance: 'importance',
@@ -2187,6 +2201,7 @@ export namespace Prisma {
     threadId?: StringNullableFilter<"ProcessedEmail"> | string | null
     sender?: StringFilter<"ProcessedEmail"> | string
     subject?: StringFilter<"ProcessedEmail"> | string
+    date?: StringNullableFilter<"ProcessedEmail"> | string | null
     snippet?: StringNullableFilter<"ProcessedEmail"> | string | null
     category?: StringFilter<"ProcessedEmail"> | string
     importance?: StringFilter<"ProcessedEmail"> | string
@@ -2206,6 +2221,7 @@ export namespace Prisma {
     threadId?: SortOrderInput | SortOrder
     sender?: SortOrder
     subject?: SortOrder
+    date?: SortOrderInput | SortOrder
     snippet?: SortOrderInput | SortOrder
     category?: SortOrder
     importance?: SortOrder
@@ -2228,6 +2244,7 @@ export namespace Prisma {
     threadId?: StringNullableFilter<"ProcessedEmail"> | string | null
     sender?: StringFilter<"ProcessedEmail"> | string
     subject?: StringFilter<"ProcessedEmail"> | string
+    date?: StringNullableFilter<"ProcessedEmail"> | string | null
     snippet?: StringNullableFilter<"ProcessedEmail"> | string | null
     category?: StringFilter<"ProcessedEmail"> | string
     importance?: StringFilter<"ProcessedEmail"> | string
@@ -2247,6 +2264,7 @@ export namespace Prisma {
     threadId?: SortOrderInput | SortOrder
     sender?: SortOrder
     subject?: SortOrder
+    date?: SortOrderInput | SortOrder
     snippet?: SortOrderInput | SortOrder
     category?: SortOrder
     importance?: SortOrder
@@ -2274,6 +2292,7 @@ export namespace Prisma {
     threadId?: StringNullableWithAggregatesFilter<"ProcessedEmail"> | string | null
     sender?: StringWithAggregatesFilter<"ProcessedEmail"> | string
     subject?: StringWithAggregatesFilter<"ProcessedEmail"> | string
+    date?: StringNullableWithAggregatesFilter<"ProcessedEmail"> | string | null
     snippet?: StringNullableWithAggregatesFilter<"ProcessedEmail"> | string | null
     category?: StringWithAggregatesFilter<"ProcessedEmail"> | string
     importance?: StringWithAggregatesFilter<"ProcessedEmail"> | string
@@ -2292,6 +2311,7 @@ export namespace Prisma {
     threadId?: string | null
     sender: string
     subject: string
+    date?: string | null
     snippet?: string | null
     category: string
     importance: string
@@ -2311,6 +2331,7 @@ export namespace Prisma {
     threadId?: string | null
     sender: string
     subject: string
+    date?: string | null
     snippet?: string | null
     category: string
     importance: string
@@ -2329,6 +2350,7 @@ export namespace Prisma {
     threadId?: NullableStringFieldUpdateOperationsInput | string | null
     sender?: StringFieldUpdateOperationsInput | string
     subject?: StringFieldUpdateOperationsInput | string
+    date?: NullableStringFieldUpdateOperationsInput | string | null
     snippet?: NullableStringFieldUpdateOperationsInput | string | null
     category?: StringFieldUpdateOperationsInput | string
     importance?: StringFieldUpdateOperationsInput | string
@@ -2348,6 +2370,7 @@ export namespace Prisma {
     threadId?: NullableStringFieldUpdateOperationsInput | string | null
     sender?: StringFieldUpdateOperationsInput | string
     subject?: StringFieldUpdateOperationsInput | string
+    date?: NullableStringFieldUpdateOperationsInput | string | null
     snippet?: NullableStringFieldUpdateOperationsInput | string | null
     category?: StringFieldUpdateOperationsInput | string
     importance?: StringFieldUpdateOperationsInput | string
@@ -2367,6 +2390,7 @@ export namespace Prisma {
     threadId?: string | null
     sender: string
     subject: string
+    date?: string | null
     snippet?: string | null
     category: string
     importance: string
@@ -2385,6 +2409,7 @@ export namespace Prisma {
     threadId?: NullableStringFieldUpdateOperationsInput | string | null
     sender?: StringFieldUpdateOperationsInput | string
     subject?: StringFieldUpdateOperationsInput | string
+    date?: NullableStringFieldUpdateOperationsInput | string | null
     snippet?: NullableStringFieldUpdateOperationsInput | string | null
     category?: StringFieldUpdateOperationsInput | string
     importance?: StringFieldUpdateOperationsInput | string
@@ -2404,6 +2429,7 @@ export namespace Prisma {
     threadId?: NullableStringFieldUpdateOperationsInput | string | null
     sender?: StringFieldUpdateOperationsInput | string
     subject?: StringFieldUpdateOperationsInput | string
+    date?: NullableStringFieldUpdateOperationsInput | string | null
     snippet?: NullableStringFieldUpdateOperationsInput | string | null
     category?: StringFieldUpdateOperationsInput | string
     importance?: StringFieldUpdateOperationsInput | string
@@ -2496,6 +2522,7 @@ export namespace Prisma {
     threadId?: SortOrder
     sender?: SortOrder
     subject?: SortOrder
+    date?: SortOrder
     snippet?: SortOrder
     category?: SortOrder
     importance?: SortOrder
@@ -2520,6 +2547,7 @@ export namespace Prisma {
     threadId?: SortOrder
     sender?: SortOrder
     subject?: SortOrder
+    date?: SortOrder
     snippet?: SortOrder
     category?: SortOrder
     importance?: SortOrder
@@ -2539,6 +2567,7 @@ export namespace Prisma {
     threadId?: SortOrder
     sender?: SortOrder
     subject?: SortOrder
+    date?: SortOrder
     snippet?: SortOrder
     category?: SortOrder
     importance?: SortOrder
