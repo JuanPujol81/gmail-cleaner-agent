@@ -8,8 +8,36 @@ An HTTP agent (Express + Google APIs) that:
 4. Builds an inbox summary and suggested actions.
 5. Uses AI for inbox analysis when the AI endpoint is called.
 6. Optionally applies Gmail labels from both local rules and AI review classifications.
+7. Stores processed email metadata in PostgreSQL through Prisma.
+8. Provides a Vite + React frontend console.
 
-## Endpoints (base: `/gmail`)
+## Frontend
+
+The React frontend lives in `frontend/`.
+
+Run the backend and frontend in separate terminals:
+
+```bash
+pnpm run dev
+pnpm run dev:frontend
+```
+
+Then open:
+
+```text
+http://127.0.0.1:5173
+```
+
+The frontend proxies `/api/*` to the backend at `http://localhost:3000`.
+
+## Endpoints
+
+### Root
+
+- `GET /` returns app status.
+- `GET /health` returns uptime.
+
+### Gmail Routes (base: `/gmail`)
 
 ### `GET /gmail/auth`
 
@@ -43,6 +71,8 @@ Response (JSON):
 {
   "status": "success",
   "count": 100,
+  "savedCount": 100,
+  "persistenceError": null,
   "inboxSummary": { "...": "..." },
   "messages": [
     {
@@ -70,6 +100,8 @@ Response (JSON):
 {
   "status": "success",
   "count": 100,
+  "savedCount": 100,
+  "persistenceError": null,
   "inboxSummary": { "...": "..." }
 }
 ```
@@ -89,8 +121,9 @@ This endpoint:
 - Builds `inboxSummary`.
 - Sends the summary to AI to produce `overview`, `priorityLevel`, `priorityReason`, `suggestedPlan`, and `safetyNote`.
 - Sends messages marked as `review_manually` to AI for a second opinion under `aiReviewClassifications`.
+- Saves processed email rows, including AI metadata when available.
 
-The AI classification is returned as analysis. This endpoint does not apply labels or modify Gmail, but `POST /gmail/actions/apply-labels` reuses the same AI classification flow to label ambiguous messages.
+The AI classification is returned as analysis. This endpoint does not apply labels or modify Gmail, but `GET/POST /gmail/actions/apply-labels` reuses the same AI classification flow to label ambiguous messages.
 
 Response (JSON):
 
@@ -98,6 +131,8 @@ Response (JSON):
 {
   "status": "success",
   "count": 100,
+  "savedCount": 100,
+  "persistenceError": null,
   "inboxSummary": { "...": "..." },
   "aiSummary": {
     "overview": "...",
@@ -121,6 +156,10 @@ Response (JSON):
 }
 ```
 
+### `GET /gmail/actions/apply-labels`
+
+Runs the same operation as `POST /gmail/actions/apply-labels`. This exists so the operation can be triggered from a browser during local development.
+
 ### `POST /gmail/actions/apply-labels`
 
 Applies Gmail labels for supported local-rule actions and also labels ambiguous messages using AI-suggested categories.
@@ -132,7 +171,10 @@ Response:
 ```json
 {
   "status": "success",
+  "method": "POST",
   "count": 100,
+  "savedCount": 100,
+  "persistenceError": null,
   "applied": {
     "AI/Job": 2,
     "AI/Promotion": 1,
@@ -146,9 +188,20 @@ Response:
   },
   "aiLabels": { "AI/Review": 1 },
   "skipped": {},
-  "aiReviewClassifications": []
+  "aiReviewClassifications": [],
+  "aiClassificationError": null
 }
 ```
+
+### Processed Email Routes (base: `/emails`)
+
+#### `GET /emails`
+
+Returns processed email records from PostgreSQL, ordered by newest processed rows first.
+
+#### `GET /emails/stats`
+
+Returns the total number of processed email records.
 
 ## Local Setup
 
@@ -167,6 +220,7 @@ PORT=3000
 GOOGLE_CREDENTIALS_PATH=./credentials.json
 GOOGLE_TOKEN_PATH=./token.json
 GROQ_API_KEY=...
+DATABASE_URL="postgresql://gmail_user:gmail_password@localhost:5432/gmail_cleaner?schema=public"
 ```
 
 `credentials.json` (OAuth Client) must include this redirect URI:
@@ -174,13 +228,15 @@ GROQ_API_KEY=...
 
 The OAuth flow creates or updates `token.json`, including the refresh token.
 
-`GROQ_API_KEY` is required for `GET /gmail/ai-summary` and `POST /gmail/actions/apply-labels`. Non-AI endpoints can start without it.
+`GROQ_API_KEY` is required for AI classification in `GET /gmail/ai-summary` and `GET/POST /gmail/actions/apply-labels`. If AI fails, ambiguous emails remain marked for manual review and the API returns `aiClassificationError`.
+
+`DATABASE_URL` is required for Prisma persistence.
 
 ### Run
 
 ```bash
 pnpm install
-pnpm dev
+pnpm run dev
 ```
 
 Then:
@@ -189,6 +245,12 @@ Then:
 2. Open the returned `url` in the browser and complete Google consent.
 3. Call `GET http://localhost:3000/gmail/messages`.
 
+For the frontend:
+
+```bash
+pnpm run dev:frontend
+```
+
 ## Module Walkthrough
 
 ### `src/app.ts`
@@ -196,8 +258,9 @@ Then:
 Initializes Express, enables CORS, and mounts:
 
 - `app.use("/gmail", gmailRoutes)`
+- `app.use("/emails", emailRoutes)`
 
-It also defines `GET /health`.
+It also defines `GET /` and `GET /health`.
 
 ### `src/auth/googleAuth.ts`
 
@@ -252,13 +315,13 @@ Gmail functions:
 AI functions:
 
 - `generateInboxAiSummary(inboxSummary)`: analyzes inbox statistics and priority with Groq through the OpenAI-compatible SDK.
-- `classifyReviewMessagesWithAi(messages)`: gives a second opinion for ambiguous messages marked as `review_manually`.
+- `classifyReviewMessagesWithAi(messages)`: gives a second opinion for ambiguous messages marked as `review_manually`, in batches of 10.
 
 The AI client is created on demand. If `GROQ_API_KEY` is missing, only endpoints that call AI fail.
 
 ## Gmail Label Execution
 
-`POST /gmail/actions/apply-labels` uses this deterministic mapping:
+`GET/POST /gmail/actions/apply-labels` uses this deterministic mapping:
 
 - `keep_in_inbox` -> `AI/Keep-In-Inbox`
 - `review_manually` -> `AI/Review`
@@ -286,7 +349,23 @@ For now, the agent only applies labels. It does not archive, delete, or move ema
 
 ## Side Effects
 
-The endpoints `GET /gmail/messages`, `GET /gmail/summary`, `GET /gmail/actions/preview`, and `GET /gmail/ai-summary` do not write local files. `POST /gmail/actions/apply-labels` modifies Gmail labels.
+- `GET /gmail/messages`, `GET /gmail/summary`, `GET /gmail/actions/preview`, and `GET /gmail/ai-summary` write processed email records to PostgreSQL.
+- `GET/POST /gmail/actions/apply-labels` writes processed email records and modifies Gmail labels.
+- The agent only applies labels. It does not archive, delete, or move emails.
+
+## Dependency Security
+
+The root `package.json` uses `pnpm.overrides` to pin patched transitive dependencies:
+
+- `qs@6.15.3`
+- `@hono/node-server@1.19.13`
+- `esbuild@0.28.1`
+
+Verify with:
+
+```bash
+pnpm audit --audit-level moderate
+```
 
 ## Credential Notes
 
