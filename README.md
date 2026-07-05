@@ -11,6 +11,29 @@ An HTTP agent (Express + Google APIs) that:
 7. Stores processed email metadata in PostgreSQL through Prisma.
 8. Provides a Vite + React frontend console.
 
+## v1 Status
+
+v1 is complete.
+
+- Professional README: this document.
+- Environment template: `.env.example`.
+- Frontend screenshot: [`docs/screenshots/frontend-console.png`](docs/screenshots/frontend-console.png).
+- Demo GIF: [`docs/demo/frontend-workflow.gif`](docs/demo/frontend-workflow.gif).
+- Endpoints documented below.
+- PostgreSQL persistence runs through Prisma.
+- Frontend displays processed emails saved in the database.
+- Groq AI behavior is documented in the AI section.
+- Safety rule: no destructive email actions without explicit confirmation.
+- `.env`, `token.json`, and `credentials.json` are ignored by Git.
+
+## Screenshots
+
+![Frontend console showing processed emails](docs/screenshots/frontend-console.png)
+
+## Demo
+
+![Frontend workflow demo](docs/demo/frontend-workflow.gif)
+
 ## Frontend
 
 The React frontend lives in `frontend/`.
@@ -213,13 +236,13 @@ Returns the total number of processed email records.
 
 ### Files / Environment Variables
 
-The project uses `.env`:
+Copy `.env.example` to `.env` and fill in local values:
 
 ```env
 PORT=3000
 GOOGLE_CREDENTIALS_PATH=./credentials.json
 GOOGLE_TOKEN_PATH=./token.json
-GROQ_API_KEY=...
+GROQ_API_KEY=replace_with_your_groq_api_key
 DATABASE_URL="postgresql://gmail_user:gmail_password@localhost:5432/gmail_cleaner?schema=public"
 ```
 
@@ -319,6 +342,13 @@ AI functions:
 
 The AI client is created on demand. If `GROQ_API_KEY` is missing, only endpoints that call AI fail.
 
+Groq is used through the OpenAI-compatible SDK with:
+
+- `baseURL: https://api.groq.com/openai/v1`
+- `model: openai/gpt-oss-20b`
+
+If Groq returns no usable classification, ambiguous emails stay in manual review and the response includes `aiClassificationError`.
+
 ## Gmail Label Execution
 
 `GET/POST /gmail/actions/apply-labels` uses this deterministic mapping:
@@ -347,11 +377,12 @@ Any unknown `recommendedAction` or AI category is reported in `skipped`.
 
 For now, the agent only applies labels. It does not archive, delete, or move emails even when the applied label is `AI/Archive-Later`, `AI/Trash-Candidate`, or `AI/Keep-In-Inbox`.
 
-## Side Effects
+## Safety And Side Effects
 
 - `GET /gmail/messages`, `GET /gmail/summary`, `GET /gmail/actions/preview`, and `GET /gmail/ai-summary` write processed email records to PostgreSQL.
 - `GET/POST /gmail/actions/apply-labels` writes processed email records and modifies Gmail labels.
-- The agent only applies labels. It does not archive, delete, or move emails.
+- The agent only applies labels. It does not archive, delete, trash, or move emails.
+- No destructive actions are performed without explicit confirmation.
 
 ## Dependency Security
 
@@ -372,6 +403,7 @@ pnpm audit --audit-level moderate
 - `credentials.json` contains `client_secret`; keep it out of public repositories.
 - `token.json` contains OAuth tokens; keep it out of public repositories.
 - `.env`, `credentials.json`, `token.json`, `node_modules/`, `dist/`, and `src/test.json` are excluded in `.gitignore`.
+- Commit `.env.example`, but never commit `.env`.
 - `token.json` can fail with `invalid_grant` if it expires or is revoked. If that happens:
   - delete `token.json`
   - rerun the flow with `GET /gmail/auth` and confirm consent again
