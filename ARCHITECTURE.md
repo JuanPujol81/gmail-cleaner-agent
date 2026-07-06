@@ -26,7 +26,8 @@ Express API
 
 The backend lives in `src/`.
 
-- `src/app.ts` creates the Express app, enables CORS and JSON parsing, and mounts routes.
+- `src/app.ts` creates the configured Express app by passing Gmail and processed-email routes into `createApp`.
+- `src/createApp.ts` owns Express app construction so basic app behavior can be exercised without starting the server or loading credential-dependent routes.
 - `src/routes/gmailRoutes.ts` exposes Gmail workflows: auth, fetch, classify, AI summary, preview labels, and apply labels.
 - `src/routes/emailRoutes.ts` exposes processed-email database reads.
 - `src/services/gmailService.ts` wraps Gmail API calls.
@@ -80,10 +81,20 @@ The project is intentionally conservative:
 - Destructive actions should require explicit confirmation before being added.
 - Secrets are never committed: `.env`, `credentials.json`, and `token.json` are ignored.
 
+## Testing Strategy
+
+Tests use Node's built-in test runner through `tsx`, so the backend does not need an additional test framework.
+
+The current suite is deliberately focused on credential-free logic:
+
+- `test/classificationService.test.ts` covers deterministic rules for security, critical financial, job, promotion, and unclear automatic emails.
+- `test/summaryServices.test.ts` covers aggregate counts, priority-message selection, recommended next steps, and suggested label actions.
+
+This keeps the portfolio review path practical: the most important safety and prioritization behavior can be verified without Gmail OAuth, Groq, PostgreSQL, or private local files.
+
 ## Local Runtime Dependencies
 
 - Node.js and pnpm.
 - Docker Desktop for PostgreSQL.
 - Google OAuth credentials with Gmail API enabled.
 - Groq API key.
-

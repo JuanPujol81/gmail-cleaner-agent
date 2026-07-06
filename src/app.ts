@@ -1,31 +1,10 @@
-import express from "express";
-import cors from "cors";
 import dotenv from "dotenv";
+import type { Express } from "express";
 import gmailRoutes from "./routes/gmailRoutes.js";
 import emailRoutes from "./routes/emailRoutes.js";
+import { createApp } from "./createApp.js";
 
 dotenv.config();
-const app = express();
-app.use(cors());
-app.use(express.json());
-app.use("/gmail", gmailRoutes);
-app.use("/emails", emailRoutes);
-const PORT = process.env.PORT || 3000;
+const app: Express = createApp({ gmailRoutes, emailRoutes });
 
-app.get("/", (req, res) => {
-  res.json({
-    message: "Gmail Cleaner Agent is running",
-    status: "ok",
-  });
-});
-
-app.get("/health", (req, res) => {
-  res.json({
-    status: "healthy",
-    uptime: process.uptime(),
-  });
-});
-
-app.listen(PORT, () => {
-  console.log(`Server running on http://localhost:${PORT}`);
-});
+export default app;

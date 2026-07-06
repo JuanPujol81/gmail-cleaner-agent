@@ -23,6 +23,7 @@ v1 is complete.
 - PostgreSQL persistence runs through Prisma.
 - Frontend displays processed emails saved in the database.
 - Groq AI behavior is documented in the AI section.
+- Credential-free backend tests cover deterministic classification and inbox summary behavior.
 - Safety rule: no destructive email actions without explicit confirmation.
 - `.env`, `token.json`, and `credentials.json` are ignored by Git.
 
@@ -60,6 +61,7 @@ This project requires personal Gmail OAuth credentials and a Groq API key. Those
 You can still review:
 
 - The source code.
+- The automated tests in `test/`.
 - The API documentation below.
 - The database schema and Prisma migrations.
 - The frontend screenshot and demo GIF.
@@ -346,16 +348,37 @@ Open:
 http://127.0.0.1:5173
 ```
 
+## Tests
+
+The backend test suite is intentionally credential-free so reviewers can run it without Gmail OAuth credentials, a Groq API key, or PostgreSQL.
+
+Run:
+
+```bash
+pnpm test
+```
+
+Current coverage focuses on the portfolio-critical agent behavior:
+
+- `test/classificationService.test.ts` verifies safety-oriented classification for security, critical financial, job, promotion, and unclear automatic emails.
+- `test/summaryServices.test.ts` verifies inbox counts, priority-message selection, recommended next steps, and suggested label actions.
+
+These tests protect the core promise of the project: the agent can prioritize and label email conservatively while avoiding destructive actions.
+
 ## Module Walkthrough
 
 ### `src/app.ts`
 
-Initializes Express, enables CORS, and mounts:
+Creates the configured Express app by mounting Gmail and processed-email routes through `createApp`.
+
+### `src/createApp.ts`
+
+Initializes Express, enables CORS and JSON parsing, defines `GET /` and `GET /health`, and optionally mounts:
 
 - `app.use("/gmail", gmailRoutes)`
 - `app.use("/emails", emailRoutes)`
 
-It also defines `GET /` and `GET /health`.
+This split keeps the runtime server behavior unchanged while making app construction easier to test without loading Gmail or database dependencies.
 
 ### `src/auth/googleAuth.ts`
 
