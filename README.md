@@ -53,6 +53,20 @@ http://127.0.0.1:5173
 
 The frontend proxies `/api/*` to the backend at `http://localhost:3000`.
 
+## For Reviewers
+
+This project requires personal Gmail OAuth credentials and a Groq API key. Those credentials are intentionally not included.
+
+You can still review:
+
+- The source code.
+- The API documentation below.
+- The database schema and Prisma migrations.
+- The frontend screenshot and demo GIF.
+- The architecture notes in [`ARCHITECTURE.md`](ARCHITECTURE.md).
+
+To run it end to end, use your own Google OAuth client, your own Groq API key, and the local PostgreSQL service from `docker-compose.yml`.
+
 ## Endpoints
 
 ### Root
@@ -231,8 +245,10 @@ Returns the total number of processed email records.
 ### Requirements
 
 - Node.js (`pnpm` is used)
+- Docker Desktop
 - A Google Cloud project with OAuth2 credentials
 - Gmail access for the account you authorize
+- A Groq API key
 
 ### Files / Environment Variables
 
@@ -255,10 +271,60 @@ The OAuth flow creates or updates `token.json`, including the refresh token.
 
 `DATABASE_URL` is required for Prisma persistence.
 
+### Google OAuth Setup
+
+Create your own OAuth credentials. Do not reuse another developer's `credentials.json`.
+
+1. Create a Google Cloud project.
+2. Enable the Gmail API.
+3. Configure the OAuth consent screen.
+4. Create an OAuth client.
+5. Add this redirect URI:
+
+```text
+http://localhost:3000/gmail/callback
+```
+
+6. Download the OAuth client JSON and save it in the project root as:
+
+```text
+credentials.json
+```
+
+7. Start the backend and open:
+
+```text
+http://localhost:3000/gmail/auth
+```
+
+After consent, the app creates `token.json` locally.
+
+### Database Setup
+
+Start PostgreSQL:
+
+```bash
+docker compose up -d
+```
+
+Apply Prisma migrations:
+
+```bash
+pnpm prisma migrate dev
+```
+
+Optional: inspect data in Prisma Studio:
+
+```bash
+pnpm prisma studio
+```
+
 ### Run
 
 ```bash
 pnpm install
+docker compose up -d
+pnpm prisma migrate dev
 pnpm run dev
 ```
 
@@ -272,6 +338,12 @@ For the frontend:
 
 ```bash
 pnpm run dev:frontend
+```
+
+Open:
+
+```text
+http://127.0.0.1:5173
 ```
 
 ## Module Walkthrough
