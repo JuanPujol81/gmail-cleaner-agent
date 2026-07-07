@@ -11,6 +11,10 @@ An HTTP agent (Express + Google APIs) that:
 7. Stores processed email metadata in PostgreSQL through Prisma.
 8. Provides a Vite + React frontend console.
 
+## Interview Summary
+
+I built a Gmail AI Cleaner as a local-first email operations tool. It connects to Gmail through OAuth, reads recent inbox messages, classifies them with deterministic safety-focused rules, and stores processed email metadata in PostgreSQL using Prisma. For ambiguous emails, it uses Groq AI as a second-pass reviewer instead of blindly automating decisions. I also built a React dashboard where users can inspect summaries, review classifications, and apply safe Gmail labels. The project intentionally avoids destructive actions like deleting or archiving emails without explicit confirmation.
+
 ## v1 Status
 
 v1 is complete.
